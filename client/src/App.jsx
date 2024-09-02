@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import { Dashboard } from "./pages/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 import useAuth from "./hooks/useAuth";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const isAuthenticated = () => !!localStorage.getItem("token");
@@ -31,7 +32,7 @@ function App() {
         },
         {
           path: "/:userId",
-          element: isAuthenticated() ? <Dashboard /> : <Navigate to="/login" />,
+          element: <Dashboard />,
         },
         {
           path: "/login",
@@ -44,6 +45,7 @@ function App() {
 
   return (
     <main className="h-full">
+      <Toaster />
       <RouterProvider router={PageRoutes} />
     </main>
   );

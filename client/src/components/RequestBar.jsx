@@ -2,11 +2,15 @@ import React, { useEffect } from "react";
 import { AddFriendsTab, FriendRequestTab, SmallInput } from "./SmallComponent";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { IoPersonAddSharp } from "react-icons/io5";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { hide } from "../features/reducers/displayReducer";
 
 const socket = io(`http://${window.location.hostname}:3003`);
 
 const RequestBar = () => {
+  const dispatch = useDispatch();
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
@@ -15,6 +19,7 @@ const RequestBar = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user.id;
 
+  // useEffect to fetch all the friend requests sent to the user
   useEffect(() => {
     const fetchFriendRequests = async () => {
       try {
@@ -29,10 +34,22 @@ const RequestBar = () => {
     fetchFriendRequests();
   }, [userId]);
 
+  // useEffect to update the friend requests using websockets anytime a friend-request is sent
   useEffect(() => {
+    const fetchFriendRequests = async () => {
+      try {
+        const response = await axios.get(`api/users/friend-requests/${userId}`);
+        setFriendRequests(response.data);
+        // console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching friend requests: ", error);
+      }
+    };
+
     const handleReceiveRequest = (request) => {
       if (request.receiver_id === userId) {
-        setFriendRequests((prevRequests) => [...prevRequests, request]);
+        // setFriendRequests((prevRequests) => [...prevRequests, request]);
+        fetchFriendRequests();
       }
     };
 
@@ -180,7 +197,7 @@ const RequestBar = () => {
             ) : (
               friendRequests.map((request) => (
                 <FriendRequestTab
-                  key={request.requestId}
+                  key={request.request_id}
                   firstName={request.first_name}
                   lastName={request.last_name}
                   username={request.username}
@@ -201,14 +218,17 @@ const RequestBar = () => {
                 {results.map((user) => (
                   <AddFriendsTab
                     key={user.id}
+                    userId={user.id}
                     firstName={user.first_name}
                     lastName={user.last_name}
                     username={user.username}
                     disabled={user.requestType === "sent" || loading}
                     onClick={() => handleSendRequest(user.id)}
+                    icon={user.requestType === "sent" ? "" : <IoPersonAddSharp size={15} />}
                     child={user.requestType === "sent" ? "Pending" : "Add"}
                     status={user.requestStatus}
-                    chat="Message"
+                    chat="Chat"
+                    chatClick={() => dispatch(hide())}
                   />
                 ))}
               </div>

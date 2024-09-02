@@ -1,15 +1,18 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import PropTypes from "prop-types";
 import { SmallChatInput } from "./SmallComponent";
 import toast from "react-hot-toast";
 import { IoMdSend } from "react-icons/io";
 import { FaChevronLeft } from "react-icons/fa";
 import { io } from "socket.io-client";
+import { Link, useParams } from "react-router-dom";
 
 const socket = io(`http://${window.location.hostname}:3003`);
 
-const ChatWindow = ({ contact, onClearContact }) => {
+const ChatWindow = () => {
+  const [contact, setContact] = React.useState([]);
+  const { userId } = useParams();
+
   const inputRef = React.useRef(null);
   const messagesEndRef = React.useRef(null);
 
@@ -20,24 +23,55 @@ const ChatWindow = ({ contact, onClearContact }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const currentUserId = user.id;
 
+  // useEffect to fetch the receivers contact
+  React.useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await axios.get(
+          `api/conversations/contact/${currentUserId}`
+        );
+
+        // setContact(response.data);
+
+        if (userId) {
+          const contacts = response.data.find(
+            (c) => c.user_id === parseInt(userId, 10)
+          );
+          setContact(contacts || null);
+        }
+      } catch (error) {
+        console.error("Error fetching contacts: ", error);
+      }
+    };
+
+    fetchContacts();
+  }, [currentUserId, userId]);
+
+  // useEffect to focus on the input bar of the page on component render
   useEffect(() => {
-    if (!contact) return;
+    if(!contact) return
+    if (contact.length == 0) return;
 
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, [contact]);
 
+  // useEffect to scroll to the bottom of the page to display the messages at the bottom
   useEffect(() => {
-    if (!contact) return;
+    if(!contact) return
+    if (contact.length == 0) return;
 
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
-  }, [contact, messages]);
+  }, [contact, messages]); // i dont like the scroll effect, ill see how i can make it start at the bottom at once instead of scrolling there
 
+  // useEffect to fetch all the messages in the convo on component render
   useEffect(() => {
-    if (!contact) return;
+    if(!contact) return
+    if (contact.length == 0) return;
+
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
@@ -52,8 +86,10 @@ const ChatWindow = ({ contact, onClearContact }) => {
     fetchMessages();
   }, [contact]);
 
+  // useEffect to update the messages using websockets anytime a message is sent or received
   useEffect(() => {
-    if (!contact) return;
+    if(!contact) return
+    if (contact.length == 0) return;
 
     const handleReceiveMessage = (message) => {
       if (message.conversation_id === contact.conversation_id) {
@@ -66,13 +102,17 @@ const ChatWindow = ({ contact, onClearContact }) => {
     return () => {
       socket.off("receive-message", handleReceiveMessage);
     };
-  }, [contact]);
+  }, [contact]); // this client-side filtering of the messages is only good for a small amount of users, for a large amunt of users, server-side filtering is preferrable
 
   const getFirstLetter = (word) => word?.charAt(0).toUpperCase() || "";
 
+  const clearContact = () => {
+    setContact([]);
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!contact || !text.trim()) return;
+    if (contact.length == 0 || !text.trim()) return;
 
     setLoading(true);
 
@@ -117,7 +157,7 @@ const ChatWindow = ({ contact, onClearContact }) => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
-  if (!contact) {
+  if (!userId) {
     return (
       <div className="flex-grow flex items-center justify-center">
         <p>Select a contact to start chatting</p>
@@ -131,14 +171,15 @@ const ChatWindow = ({ contact, onClearContact }) => {
         <div className="pr-[10px] flex flex-col h-full">
           <div className="py-3 w-full">
             <div className="flex">
-              <div
+              <Link
+                onClick={() => clearContact()}
+                to="/"
                 className="w-9 h-9 rounded-full cursor-pointer flex items-center justify-center bg-gray-700 mr-3"
-                onClick={() => onClearContact()}
               >
                 <span className="w-full h-full flex items-center justify-center">
                   <FaChevronLeft />
                 </span>
-              </div>
+              </Link>
               <div className="flex gap-3 items-center">
                 <div className="w-9 h-9 rounded-full cursor-pointer flex items-center justify-center bg-neutral">
                   <p className="text-[18px] font-bold">
@@ -245,9 +286,9 @@ const ChatWindow = ({ contact, onClearContact }) => {
   );
 };
 
-ChatWindow.propTypes = {
-  contact: PropTypes.any,
-  onClearContact: PropTypes.func.isRequired,
-};
+// ChatWindow.propTypes = {
+//   contact: PropTypes.any,
+//   onClearContact: PropTypes.func.isRequired,
+// };
 
 export default ChatWindow;

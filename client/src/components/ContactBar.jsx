@@ -1,35 +1,80 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React from "react";
+import { io } from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchContacts } from "../features/reducers/contactSlice";
+import { Link } from "react-router-dom";
 
-const ContactBar = ({ contacts = [], onSelectContact }) => {
-  const [contact, setContact] = useState([]);
+const socket = io(`http://${window.location.hostname}:3003`);
+
+const ContactBar = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector((state) => state.contacts.contacts);
+  const status = useSelector((state) => state.contacts.status);
+  const error = useSelector((state) => state.contacts.error);
+
   const getFirstLetter = (word) => word?.charAt(0).toUpperCase() || "";
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const currentUserId = user?.id;
+
   React.useEffect(() => {
-    if (!contacts) return;
-    const fetchContact = async () => {
-      try {
-        setContact(contacts);
-      } catch (error) {
-        console.error("Error fetching contact:", error);
+    const handleUpdateContact = (convo) => {
+      console.log(convo);
+      if (
+        currentUserId === convo.user1_id ||
+        currentUserId === convo.user2_id
+      ) {
+        dispatch(fetchContacts(currentUserId));
       }
     };
 
-    fetchContact();
-  }, [contacts]);
+    socket.on("receive-convo", handleUpdateContact);
+
+    return () => {
+      socket.off("receive-convo", handleUpdateContact);
+    };
+  });
+
+  React.useEffect(() => {
+    if (currentUserId) {
+      dispatch(fetchContacts(currentUserId));
+    }
+  }, [currentUserId, dispatch]);
+
+  if (status === "loading") {
+    return (
+      <div className="h-full w-full flex lg:flex-col overflow-scroll lg:overflow-auto items-center justify-start py-2 px-[7px]">
+        <p className="text-center my-auto text-[12px] text-label">
+          Loading contacts...
+        </p>
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    console.error(error);
+
+    return (
+      <div className="h-full w-full flex lg:flex-col overflow-scroll lg:overflow-auto items-center justify-start py-2 px-[7px]">
+        <p className="text-center my-auto text-[12px] text-label">
+          We could not retrieve your contacts
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="h-full w-full flex lg:flex-col overflow-scroll lg:overflow-auto items-center justify-start py-2 px-[7px]">
-        {contact.length === 0 ? (
+        {contacts.length === 0 ? (
           <p className="text-center my-auto text-[12px] text-label">
             You have no contact
           </p>
         ) : (
-          contact.map((contact) => (
-            <div
+          contacts.map((contact) => (
+            <Link
+              to={`/${contact.user_id}`}
               className="lg:w-full w-max rounded-xl lg:p-[9px] lg:px-[9px] p-2.5 px-3 hover:bg-seeThrough cursor-pointer"
-              onClick={() => onSelectContact(contact)}
               key={contact.user_id}
             >
               <div className="flex flex-col items-center lg:justify-start justify-center lg:flex-row gap-2">
@@ -54,17 +99,12 @@ const ContactBar = ({ contacts = [], onSelectContact }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
     </>
   );
-};
-
-ContactBar.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.any).isRequired,
-  onSelectContact: PropTypes.func.isRequired,
 };
 
 export default ContactBar;

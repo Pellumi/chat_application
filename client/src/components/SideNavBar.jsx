@@ -3,27 +3,26 @@ import { SmallInput, SmallProfile } from "./SmallComponent";
 import { useNavigate } from "react-router-dom";
 import { MdCancel } from "react-icons/md";
 import { IoPersonAddSharp } from "react-icons/io5";
-import PropTypes from 'prop-types';
 import RequestBar from "./RequestBar";
 import ContactBar from "./ContactBar";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleDisplay } from "../features/reducers/displayReducer";
 
-
-const SideNavBar = ({contacts, onSelectContact}) => {
+const SideNavBar = () => {
+  const dispatch = useDispatch();
+  const isRequestVisible = useSelector(
+    (state) => state.displayReducer.isVisible
+  );
   const [showProfile, setShowProfile] = React.useState(false);
-  const [showRequests, setShowRequests] = React.useState(false);
-  
+
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const getFirstLetter = (word) => word?.charAt(0).toUpperCase() || '';
+  const getFirstLetter = (word) => word?.charAt(0).toUpperCase() || "";
 
   const toggleProfile = () => {
     setShowProfile(!showProfile);
-  };
-
-  const handleShowRequests = () => {
-    setShowRequests(!showRequests);
   };
 
   const handleLogOut = () => {
@@ -67,29 +66,24 @@ const SideNavBar = ({contacts, onSelectContact}) => {
             <div className="w-9 h-9 rounded-full bg-white"></div>
             <div
               className="w-9 h-9 rounded-full flex items-center bg-transparent justify-center cursor-pointer"
-              onClick={handleShowRequests}
+              onClick={() => dispatch(toggleDisplay())}
             >
-              {showRequests ? (
+              {isRequestVisible ? (
                 <MdCancel size={38} />
               ) : (
                 <IoPersonAddSharp size={24} className="red" />
               )}
             </div>
-            {showRequests && <RequestBar />}
+            {isRequestVisible && <RequestBar />}
           </div>
           <div className="w-full flex flex-col px-4 py-1 border-b border-acc_color">
             <SmallInput type="search" placeholder="Search" />
           </div>
-          <ContactBar contacts={contacts} onSelectContact={onSelectContact}/>
+          <ContactBar />
         </div>
       </nav>
     </>
   );
-};
-
-SideNavBar.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.any).isRequired,
-  onSelectContact: PropTypes.func.isRequired,
 };
 
 export default SideNavBar;

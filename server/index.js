@@ -41,7 +41,6 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   socket.on("send-message", (message) => {
     io.emit("receive-message", message);
-    // console.log(message)
   });
 
   socket.on("send-request", (request) => {
@@ -50,7 +49,6 @@ io.on("connection", (socket) => {
 
   socket.on("send-convo", (convo) => {
     io.emit("receive-convo", convo);
-    // console.log(convo)
   });
 
   socket.on("disconnect", () => {

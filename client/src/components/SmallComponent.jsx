@@ -1,6 +1,8 @@
 import React, { forwardRef } from "react";
+import { CiChat1 } from "react-icons/ci";
 import { MdCancel } from "react-icons/md";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 export const SmallInput = ({ type, value, onChange, placeholder }) => {
   return (
@@ -115,6 +117,7 @@ const getFirstLetter = (word) => {
 };
 
 export const AddFriendsTab = ({
+  userId,
   firstName,
   lastName,
   username,
@@ -122,6 +125,7 @@ export const AddFriendsTab = ({
   onClick,
   status,
   chat,
+  icon,
   chatClick,
   child,
 }) => {
@@ -147,17 +151,23 @@ export const AddFriendsTab = ({
         </div>
         <div className="">
           {status === "accepted" ? (
-            <button id="sendRequest" onClick={chatClick} className="">
-              {chat}
-            </button>
+            <Link
+              to={`/${userId}`}
+              id="sendRequest"
+              onClick={chatClick}
+              className="bg-gray-700 flex items-center justify-center py-1 px-2 rounded-md gap-1"
+            >
+              <CiChat1 size={20} />{" "}
+              <p className="font-medium text-sm">{chat}</p>
+            </Link>
           ) : (
             <button
               id="sendRequest"
               disabled={disabled}
               onClick={onClick}
-              className=""
+              className="bg-gray-700 py-1 px-2 flex items-center justify-center rounded-md gap-2"
             >
-              {child}
+              {icon} <p className="font-medium text-sm">{child}</p>
             </button>
           )}
         </div>
