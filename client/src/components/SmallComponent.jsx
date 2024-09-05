@@ -79,7 +79,7 @@ export const SmallProfile = ({
 }) => {
   return (
     <>
-      <div className="absolute w-[200px] bg-bg_color border border-acc_color rounded-xl left-2 top-[calc(8px+100%)] p-2">
+      <div className="absolute z-[50] w-[200px] bg-bg_color border border-acc_color rounded-xl left-2 top-[calc(8px+100%)] p-2">
         <div className="flex flex-col gap-2">
           <h3 className="text-xs font-normal">{username}</h3>
           <div className="flex gap-2">
