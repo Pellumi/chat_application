@@ -2,14 +2,17 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { SmallChatInput } from "./SmallComponent";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { IoMdSend } from "react-icons/io";
 import { FaChevronLeft } from "react-icons/fa";
 import { io } from "socket.io-client";
 import { Link, useParams } from "react-router-dom";
+import { removeActive } from "../features/reducers/activeTabSlice";
 
 const socket = io(`http://${window.location.hostname}:3003`);
 
 const ChatWindow = () => {
+  const dispatch = useDispatch();
   const [contact, setContact] = React.useState([]);
   const { userId } = useParams();
 
@@ -25,6 +28,9 @@ const ChatWindow = () => {
 
   // useEffect to fetch the receivers contact
   React.useEffect(() => {
+    if (!currentUserId) return;
+    if (currentUserId == null) return;
+
     const fetchContacts = async () => {
       try {
         const response = await axios.get(
@@ -49,7 +55,7 @@ const ChatWindow = () => {
 
   // useEffect to focus on the input bar of the page on component render
   useEffect(() => {
-    if(!contact) return
+    if (!contact) return;
     if (contact.length == 0) return;
 
     if (inputRef.current) {
@@ -59,7 +65,7 @@ const ChatWindow = () => {
 
   // useEffect to scroll to the bottom of the page to display the messages at the bottom
   useEffect(() => {
-    if(!contact) return
+    if (!contact) return;
     if (contact.length == 0) return;
 
     if (messagesEndRef.current) {
@@ -69,7 +75,7 @@ const ChatWindow = () => {
 
   // useEffect to fetch all the messages in the convo on component render
   useEffect(() => {
-    if(!contact) return
+    if (!contact) return;
     if (contact.length == 0) return;
 
     const fetchMessages = async () => {
@@ -88,7 +94,7 @@ const ChatWindow = () => {
 
   // useEffect to update the messages using websockets anytime a message is sent or received
   useEffect(() => {
-    if(!contact) return
+    if (!contact) return;
     if (contact.length == 0) return;
 
     const handleReceiveMessage = (message) => {
@@ -108,6 +114,7 @@ const ChatWindow = () => {
 
   const clearContact = () => {
     setContact([]);
+    dispatch(removeActive());
   };
 
   const handleSendMessage = async (e) => {
@@ -172,7 +179,7 @@ const ChatWindow = () => {
           <div className="py-3 w-full">
             <div className="flex">
               <Link
-                onClick={() => clearContact()}
+                onClick={clearContact}
                 to="/"
                 className="w-9 h-9 rounded-full cursor-pointer flex items-center justify-center bg-gray-700 mr-3"
               >
@@ -195,10 +202,11 @@ const ChatWindow = () => {
               </div>
             </div>
           </div>
-          <div className="bg-acc_color max-h-[620px] flex-grow flex flex-col w-full rounded-xl">
+          <div className="bg-[url('../../public/pexels-steve-1292241.jpg')] relative overflow-hidden bg-cover bg-no-repeat bg-center flex-grow flex flex-col w-full rounded-xl">
+            <div className="absolute inset-0 z-[0] bg-black opacity-70"></div>
             <div
               ref={messagesEndRef}
-              className="flex-grow  overflow-y-scroll hide-scrollbar p-4 lg:mx-10"
+              className="flex-grow relative z-0 overflow-y-scroll hide-scrollbar p-4 lg:mx-10"
             >
               {messages.map((message, index) => {
                 const currentMessageDate = new Date(
@@ -223,14 +231,14 @@ const ChatWindow = () => {
                     <div className="w-full flex items-start">
                       {message.sender_id === currentUserId ? (
                         <div className="ml-auto flex bg-red-950 px-3 py-1 mb-1 w-max shadow-md rounded-lg rounded-tr-none break-words whitespace-normal">
-                          <p className="max-w-[450px] text-sm my-1 mr-2 break-words whitespace-normal">
+                          <p className="lg:max-w-[450px] max-w-[150px] text-sm my-1 mr-2 break-words whitespace-normal">
                             {message.message_text}
                           </p>
                           <span className=" text-[10px] flex items-end text-gray-400 text-right">
                             {new Date(message.timestamp).toLocaleTimeString(
                               [],
                               {
-                                hour: "2-digit",
+                                hour: "numeric",
                                 minute: "2-digit",
                               }
                             )}
@@ -238,14 +246,14 @@ const ChatWindow = () => {
                         </div>
                       ) : (
                         <div className="flex bg-gray-950 px-3 py-1 mb-1 w-max shadow-md rounded-lg rounded-tl-none break-words whitespace-normal">
-                          <p className="max-w-[450px] text-sm my-1 mr-2 break-words whitespace-normal">
+                          <p className="lg:max-w-[450px] max-w-[150px] text-sm my-1 mr-2 break-words whitespace-normal">
                             {message.message_text}
                           </p>
                           <span className=" text-[10px] flex items-end text-gray-400 text-right">
                             {new Date(message.timestamp).toLocaleTimeString(
                               [],
                               {
-                                hour: "2-digit",
+                                hour: "numeric",
                                 minute: "2-digit",
                               }
                             )}
@@ -257,7 +265,7 @@ const ChatWindow = () => {
                 );
               })}
             </div>
-            <div className="w-full pt-2 pb-5 pl-2.5 pr-2 flex items-center justify-center">
+            <div className="w-full relative z-0 pt-2 pb-5 pl-2.5 pr-2 flex items-center justify-center">
               <form
                 action=""
                 onSubmit={handleSendMessage}
