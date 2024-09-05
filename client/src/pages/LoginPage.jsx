@@ -58,10 +58,13 @@ const LoginPage = () => {
         setPassword("");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred! Please try again.", {
-        duration: 6000,
-        icon: "🚨",
-      });
+      toast.error(
+        error.response?.data?.message || "An error occurred! Please try again.",
+        {
+          duration: 6000,
+          icon: "🚨",
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -102,10 +105,13 @@ const LoginPage = () => {
         localStorage.setItem("user", JSON.stringify(user));
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "An error occurred! Please try again.", {
-        duration: 6000,
-        icon: "🚨",
-      });
+      toast.error(
+        error.response?.data?.message || "An error occurred! Please try again.",
+        {
+          duration: 6000,
+          icon: "🚨",
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -113,7 +119,8 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="container min-h-screen flex items-center lg:justify-center justify-start flex-col h-full w-full px-4 lg:px-0">
+      <div className="w-full min-h-screen flex items-center bg-[url('../../public/pexels-steve-1292241.jpg')] bg-cover bg-no-repeat bg-center lg:justify-center justify-start flex-col h-full px-4 lg:px-0">
+        <div className="absolute inset-0 bg-black opacity-70 lg:opacity-90"></div>
         <nav className="h-max w-full"></nav>
         <div
           className="relative lg:block flex flex-col-reverse overflow-hidden bg-seeThrough rounded-3xl shadow-custom-shadow w-full max-w-[768px] min-h-[480px] h-max mt-8 lg:mt-0 lg:p-10"
@@ -167,7 +174,13 @@ const LoginPage = () => {
               <SmallPrimaryButton
                 type="submit"
                 disabled={loading}
-                child={loading ? <ImSpinner8 size={18} className="animate-spin"/> : "Sign Up"}
+                child={
+                  loading ? (
+                    <ImSpinner8 size={18} className="animate-spin" />
+                  ) : (
+                    "Sign Up"
+                  )
+                }
               />
             </form>
           </div>
@@ -206,7 +219,13 @@ const LoginPage = () => {
               <SmallPrimaryButton
                 type="submit"
                 disabled={loading}
-                child={loading ? <ImSpinner8 size={18} className="animate-spin"/> : "Sign In"}
+                child={
+                  loading ? (
+                    <ImSpinner8 size={18} className="animate-spin" />
+                  ) : (
+                    "Sign In"
+                  )
+                }
               />
             </form>
           </div>
