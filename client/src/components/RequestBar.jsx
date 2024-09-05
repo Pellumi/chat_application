@@ -173,7 +173,7 @@ const RequestBar = () => {
 
   return (
     <>
-      <div className="absolute w-[340px] min-h-[340px] bg-bg_color border border-acc_color rounded-xl right-3 top-[calc(8px+100%)] lg:top-3 lg:left-[calc(8px+100%)] p-3">
+      <div className="absolute z-[50] w-[340px] min-h-[340px] bg-bg_color border border-acc_color rounded-xl right-3 top-[calc(8px+100%)] lg:top-3 lg:left-[calc(8px+100%)] p-3">
         <h1 className="text-base text-lightLabel font-semibold text-center">
           Add Friends
         </h1>
