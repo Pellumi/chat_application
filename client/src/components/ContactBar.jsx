@@ -5,7 +5,7 @@ import { fetchContacts } from "../features/reducers/contactSlice";
 import { Link } from "react-router-dom";
 import { setActiveTab } from "../features/reducers/activeTabSlice";
 
-const socket = io(`https://${window.location.hostname}/socket.io`);
+const socket = io(`https://chat-app-server-irq0.onrender.com`);
 
 const ContactBar = ({ contacts, status, error }) => {
   const dispatch = useDispatch();

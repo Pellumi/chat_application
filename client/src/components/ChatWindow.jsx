@@ -9,7 +9,7 @@ import { io } from "socket.io-client";
 import { Link, useParams } from "react-router-dom";
 import { removeActive } from "../features/reducers/activeTabSlice";
 
-const socket = io(`https://${window.location.hostname}/socket.io`);
+const socket = io(`https://chat-app-server-irq0.onrender.com`);
 
 const ChatWindow = () => {
   const dispatch = useDispatch();
