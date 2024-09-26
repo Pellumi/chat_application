@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { hide } from "../features/reducers/displayReducer";
 
-const socket = io(`http://${window.location.hostname}:3003`);
+const socket = io(`https://${window.location.hostname}:3003`);
 
 const RequestBar = () => {
   const dispatch = useDispatch();

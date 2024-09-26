@@ -5,7 +5,7 @@ import { fetchContacts } from "../features/reducers/contactSlice";
 import { Link } from "react-router-dom";
 import { setActiveTab } from "../features/reducers/activeTabSlice";
 
-const socket = io(`http://${window.location.hostname}:3003`);
+const socket = io(`https://${window.location.hostname}:3003`);
 
 const ContactBar = ({ contacts, status, error }) => {
   const dispatch = useDispatch();
