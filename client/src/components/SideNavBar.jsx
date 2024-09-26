@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { MdCancel } from "react-icons/md";
 import { IoPersonAddSharp } from "react-icons/io5";
 import RequestBar from "./RequestBar";
-import viteLogo from '../../public/vite.svg'
+import viteLogo from '/vite.svg'
 import ContactBar from "./ContactBar";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchContacts } from "../features/reducers/contactSlice";

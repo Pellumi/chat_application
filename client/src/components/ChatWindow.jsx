@@ -164,6 +164,16 @@ const ChatWindow = () => {
     return new Date(date).toLocaleDateString(undefined, options);
   };
 
+  const formatTimeWithLowercase = (date) => {
+    const timeString = new Date(date).toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    const [time, period] = timeString.split(" ");
+    return `${time} ${period?.toLowerCase()}`;
+  };
+
   if (!userId) {
     return (
       <div className="flex-grow flex items-center justify-center">
@@ -202,7 +212,7 @@ const ChatWindow = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[url('../../public/pexels-steve-1292241.jpg')] relative overflow-hidden bg-cover bg-no-repeat bg-center flex-grow flex flex-col w-full rounded-xl">
+          <div className="bg-[url('/pexels-steve-1292241.jpg')] relative overflow-hidden bg-cover bg-no-repeat bg-center flex-grow flex flex-col w-full rounded-xl">
             <div className="absolute inset-0 z-[0] bg-black opacity-70"></div>
             <div
               ref={messagesEndRef}
@@ -221,27 +231,24 @@ const ChatWindow = () => {
                   <div key={message.id} className="w-full">
                     {currentMessageDate !== previousMessageDate && (
                       <div className="flex items-center my-4">
-                        <div className="flex-grow border-t border-gray-500"></div>
-                        <span className="mx-4 text-xs text-gray-400">
-                          {formatDate(message.timestamp)}
+                        {/* <div className="flex-grow border-t border-gray-500"></div> */}
+                        <span className="mx-auto bg-bg_color py-2 px-4 font-medium rounded-lg uppercase text-xs text-gray-400">
+                          {new Date(message.timestamp).getDate() ===
+                          new Date().getDate()
+                            ? "Today"
+                            : formatDate(message.timestamp)}
                         </span>
-                        <div className="flex-grow border-t border-gray-500"></div>
+                        {/* <div className="flex-grow border-t border-gray-500"></div> */}
                       </div>
                     )}
                     <div className="w-full flex items-start">
                       {message.sender_id === currentUserId ? (
-                        <div className="ml-auto flex bg-red-950 px-3 py-1 mb-1 w-max shadow-md rounded-lg rounded-tr-none break-words whitespace-normal">
+                        <div className="ml-auto flex bg-primary px-3 py-1 mb-1 w-max shadow-md rounded-lg rounded-tr-none break-words whitespace-normal">
                           <p className="lg:max-w-[450px] max-w-[150px] text-sm my-1 mr-2 break-words whitespace-normal">
                             {message.message_text}
                           </p>
                           <span className=" text-[10px] flex items-end text-gray-400 text-right">
-                            {new Date(message.timestamp).toLocaleTimeString(
-                              [],
-                              {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              }
-                            )}
+                            {formatTimeWithLowercase(message.timestamp)}
                           </span>
                         </div>
                       ) : (
@@ -250,13 +257,7 @@ const ChatWindow = () => {
                             {message.message_text}
                           </p>
                           <span className=" text-[10px] flex items-end text-gray-400 text-right">
-                            {new Date(message.timestamp).toLocaleTimeString(
-                              [],
-                              {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              }
-                            )}
+                            {formatTimeWithLowercase(message.timestamp)}
                           </span>
                         </div>
                       )}

@@ -31,14 +31,51 @@ conversationRouter.get("/contact/:userId", async (req, res) => {
   }
 
   connection.query(
-    `SELECT c.id AS conversation_id, u.id AS user_id, u.username, u.first_name, u.last_name 
-    FROM users u 
-    JOIN conversations c 
+    `SELECT 
+        c.id AS conversation_id, 
+        u.id AS user_id, 
+        u.username, 
+        u.first_name, 
+        u.last_name,
+        cm.sender_id,
+        cm.message_text,
+        cm.timestamp
+    FROM 
+        Users u 
+    JOIN 
+        Conversations c 
     ON (
-    (c.user1_id = u.id AND c.user2_id = ?)
-    OR 
-    (c.user2_id = u.id AND c.user1_id = ?)
-    )`,
+        (c.user1_id = u.id AND c.user2_id = ?)
+        OR 
+        (c.user2_id = u.id AND c.user1_id = ?)
+    )
+    LEFT JOIN 
+    (
+        SELECT 
+            cm1.conversation_id, 
+            cm1.sender_id,
+            cm1.message_text, 
+            cm1.timestamp
+        FROM 
+            ConversationMessages cm1
+        JOIN 
+        (
+            SELECT 
+                conversation_id, 
+                MAX(timestamp) AS latest_timestamp
+            FROM 
+                ConversationMessages 
+            GROUP BY 
+                conversation_id
+        ) cm2 
+        ON 
+            cm1.conversation_id = cm2.conversation_id 
+            AND cm1.timestamp = cm2.latest_timestamp
+    ) cm 
+    ON 
+        cm.conversation_id = c.id
+    ORDER BY 
+        cm.timestamp DESC;`,
     [userId, userId],
     (err, results) => {
       if (err) {
@@ -50,5 +87,6 @@ conversationRouter.get("/contact/:userId", async (req, res) => {
     }
   );
 });
+
 
 module.exports = conversationRouter;

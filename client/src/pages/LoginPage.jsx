@@ -119,7 +119,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="w-full min-h-screen flex items-center bg-[url('../../public/pexels-steve-1292241.jpg')] bg-cover bg-no-repeat bg-center lg:justify-center justify-start flex-col h-full px-4 lg:px-0">
+      <div className="w-full min-h-screen flex items-center bg-[url('/pexels-steve-1292241.jpg')] bg-cover bg-no-repeat bg-center lg:justify-center justify-start flex-col h-full px-4 lg:px-0">
         <div className="absolute inset-0 bg-black opacity-70 lg:opacity-90"></div>
         <nav className="h-max w-full"></nav>
         <div

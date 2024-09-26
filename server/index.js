@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const connection = require("./db/connect");
 const app = express();
 
-const port = 3003;
+const PORT = process.env.PORT || 3003;
 
 const userRouter = require("./routes/userRouter");
 const conversationRouter = require("./routes/conversationRouter");
@@ -55,6 +55,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on http://localhost:${port}`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port: ${PORT}`);
 });

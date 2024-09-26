@@ -7,11 +7,11 @@ const authentication = require("../middleware/auth"); //
 const userRouter = express.Router();
 
 // route to sign up
-userRouter.post("/signup", async (req, res) => {
+userRouter.post("/signedup", async (req, res) => {
   const { first_name, last_name, username, email, password } = req.body;
 
   connection.query(
-    "SELECT * FROM users WHERE email = ? OR username = ?",
+    "SELECT * FROM Users WHERE email = ? OR username = ?",
     [email, username],
     async (err, results) => {
       if (results.length > 0) {
@@ -24,7 +24,7 @@ userRouter.post("/signup", async (req, res) => {
 
       // insert a new member
       connection.query(
-        "INSERT INTO users (first_name, last_name, username, email, password_hash) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO Users (first_name, last_name, username, email, password_hash) VALUES (?, ?, ?, ?, ?)",
         [first_name, last_name, username, email, password_hash],
         (err, results) => {
           if (err) throw err;
@@ -42,6 +42,54 @@ userRouter.post("/signup", async (req, res) => {
   );
 });
 
+userRouter.post("/signup", async (req, res) => {
+  const { first_name, last_name, username, email, password } = req.body;
+
+  try {
+    // Check if email or username already exists
+    connection.query(
+      "SELECT * FROM Users WHERE email = ? OR username = ?",
+      [email, username],
+      async (err, results) => {
+        if (err) {
+          return res.status(500).json({ message: "Database error", error: err });
+        }
+        
+        if (results.length > 0) {
+          return res
+            .status(400)
+            .json({ message: "Username or email already exists" });
+        }
+
+        // Hash the password
+        const password_hash = await bcrypt.hash(password, 10); // 10 is the salt round value that determines complexity
+
+        // Insert a new user into the database
+        connection.query(
+          "INSERT INTO Users (first_name, last_name, username, email, password_hash) VALUES (?, ?, ?, ?, ?)",
+          [first_name, last_name, username, email, password_hash],
+          (err, results) => {
+            if (err) {
+              return res.status(500).json({ message: "Error creating user", error: err });
+            }
+
+            // Generate a JWT token
+            const token = jwt.sign(
+              { id: results.insertId },
+              process.env.JWT_SECRET || "your_jwt_secret_key", // Use environment variable for JWT secret
+              { expiresIn: "1h" }
+            );
+
+            return res.status(201).json({ message: "User created", token });
+          }
+        );
+      }
+    );
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 module.exports = userRouter;
 
 // route to login user
@@ -49,7 +97,7 @@ userRouter.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   connection.query(
-    "SELECT * FROM users WHERE email = ?",
+    "SELECT * FROM Users WHERE email = ?",
     [email],
     async (err, results) => {
       if (err) throw err;
@@ -98,7 +146,7 @@ userRouter.get("/search", async (req, res) => {
       "SELECT u.id, u.first_name, u.last_name, u.username, " +
         "COALESCE(fr1.status, fr2.status) AS requestStatus, " +
         "CASE WHEN fr1.id IS NOT NULL THEN 'received' WHEN fr2.id IS NOT NULL THEN 'sent' ELSE 'none' END AS requestType " +
-        "FROM users u " +
+        "FROM Users u " +
         "LEFT JOIN FriendRequests fr1 ON fr1.sender_id = u.id AND fr1.receiver_id = ? " + // Requests sent to the current user
         "LEFT JOIN FriendRequests fr2 ON fr2.receiver_id = u.id AND fr2.sender_id = ? " + // Requests sent by the current user
         "WHERE u.username LIKE ? AND u.id != ?",

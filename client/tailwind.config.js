@@ -30,7 +30,7 @@ export default {
       colors: {
         seeThrough: '#000000bf',
         fadedBg: '#424242',
-        primary: '#ed500a',
+        primary: '#c26300',
         secondary: '#161b22',
         bg_color: '#0b0e14',
         acc_color: '#30363d',

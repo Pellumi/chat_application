@@ -50,24 +50,32 @@ const ContactBar = ({ contacts, status, error }) => {
   const formatDate = (date) => {
     const messageDate = new Date(date).getDate();
     const currentDate = new Date().getDate();
-
+  
     const options = {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     };
-
-    if (currentDate === messageDate) {
-      return new Date(date).toLocaleTimeString([], {
+  
+    const formatTimeWithLowercase = (date) => {
+      const timeString = new Date(date).toLocaleTimeString([], {
         hour: "numeric",
         minute: "2-digit",
       });
+  
+      const [time, period] = timeString.split(" ");
+      return `${time} ${period?.toLowerCase()}`;
+    };
+  
+    if (currentDate === messageDate) {
+      return formatTimeWithLowercase(date);
     } else if (currentDate === messageDate + 1) {
       return "Yesterday";
     } else {
       return new Date(date).toLocaleDateString(undefined, options);
     }
   };
+  
 
   if (status === "loading") {
     return (
@@ -124,18 +132,26 @@ const ContactBar = ({ contacts, status, error }) => {
                     <h2 className="text-base text-lightLabel whitespace-nowrap overflow-hidden overflow-ellipsis font-medium">
                       {contact.username}
                     </h2>
-                    <p className="hidden lg:block text-[12px] font-medium text-lightLabel">
+                    <p className="hidden opacity-70 lg:block text-[11px] text-lightLabel">
                       {formatDate(contact.timestamp)}
                     </p>
                   </div>
-                  <div className="hidden w-full lg:flex items-center justify-start gap-1">
-                    <p className="text-xs font-medium text-primary">
-                      {contact.sender_id === currentUserId ? "You:" : "Them:"}
-                    </p>
-                    <h2 className="text-[14px] text-left max-w-[200px] text-lightLabel pr-1 whitespace-nowrap overflow-hidden overflow-ellipsis">
-                      {contact.message_text}
-                    </h2>
-                  </div>
+                  {!contact.message_text ? (
+                    <div className="hidden w-full lg:flex items-center justify-start gap-1">
+                      <h2 className="text-[14px] text-left max-w-[200px] text-lightLabel pr-1 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                        Click Here to start a conversation
+                      </h2>
+                    </div>
+                  ) : (
+                    <div className="hidden w-full lg:flex items-center justify-start gap-1">
+                      <p className="text-xs font-medium text-primary">
+                        {contact.sender_id === currentUserId ? "You:" : "Them:"}
+                      </p>
+                      <h2 className="text-[14px] text-left max-w-[200px] text-lightLabel pr-1 whitespace-nowrap overflow-hidden overflow-ellipsis">
+                        {contact.message_text}
+                      </h2>
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>
