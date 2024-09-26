@@ -39,7 +39,7 @@ const LoginPage = () => {
     };
 
     try {
-      const response = await axios.post("api/users/signup", userDetails);
+      const response = await axios.post("/api/users/signup", userDetails);
 
       if (response.status === 201) {
         toast.success("User created successfully. Proceed to login", {
@@ -75,7 +75,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("api/users/login", {
+      const response = await axios.post("/api/users/login", {
         email: lEmail,
         password: lPassword,
       });

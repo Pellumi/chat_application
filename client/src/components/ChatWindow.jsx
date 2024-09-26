@@ -34,7 +34,7 @@ const ChatWindow = () => {
     const fetchContacts = async () => {
       try {
         const response = await axios.get(
-          `api/conversations/contact/${currentUserId}`
+          `/api/conversations/contact/${currentUserId}`
         );
 
         // setContact(response.data);
@@ -81,7 +81,7 @@ const ChatWindow = () => {
     const fetchMessages = async () => {
       try {
         const response = await axios.get(
-          `api/messages/get-message/${contact.conversation_id}`
+          `/api/messages/get-message/${contact.conversation_id}`
         );
         setMessages(response.data);
       } catch (error) {
@@ -124,7 +124,7 @@ const ChatWindow = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("api/messages/send-message", {
+      const response = await axios.post("/api/messages/send-message", {
         conversation_id: contact.conversation_id,
         sender_id: currentUserId,
         receiver_id: contact.user_id,

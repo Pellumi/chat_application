@@ -23,7 +23,7 @@ const RequestBar = () => {
   useEffect(() => {
     const fetchFriendRequests = async () => {
       try {
-        const response = await axios.get(`api/users/friend-requests/${userId}`);
+        const response = await axios.get(`/api/users/friend-requests/${userId}`);
         setFriendRequests(response.data);
         // console.log(response.data);
       } catch (error) {
@@ -38,7 +38,7 @@ const RequestBar = () => {
   useEffect(() => {
     const fetchFriendRequests = async () => {
       try {
-        const response = await axios.get(`api/users/friend-requests/${userId}`);
+        const response = await axios.get(`/api/users/friend-requests/${userId}`);
         setFriendRequests(response.data);
         // console.log(response.data);
       } catch (error) {
@@ -69,7 +69,7 @@ const RequestBar = () => {
         const token = localStorage.getItem("token");
         const user = JSON.parse(localStorage.getItem("user"));
         const userId = user.id;
-        const response = await axios.get("api/users/search", {
+        const response = await axios.get("/api/users/search", {
           params: { q: value, userId },
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -90,7 +90,7 @@ const RequestBar = () => {
     const senderId = user.id;
 
     try {
-      const response = await axios.post("api/users/friend-request/send", {
+      const response = await axios.post("/api/users/friend-request/send", {
         sender_id: senderId,
         receiver_id: receiverId,
       });
@@ -129,11 +129,11 @@ const RequestBar = () => {
 
   const handleAccept = async (requestId, id) => {
     try {
-      const response = await axios.post("api/users/friend-request/accept", {
+      const response = await axios.post("/api/users/friend-request/accept", {
         requestId,
       });
       if (response.status === 200) {
-        await axios.post("api/conversations/create", {
+        await axios.post("/api/conversations/create", {
           user1_id: userId,
           user2_id: id,
         });
@@ -156,7 +156,7 @@ const RequestBar = () => {
 
   const handleReject = async (requestId) => {
     try {
-      const response = await axios.post("api/users/friend-request/reject", {
+      const response = await axios.post("/api/users/friend-request/reject", {
         requestId,
       });
       if (response.status === 200) {
